@@ -52,11 +52,12 @@ function Install-Windows11Bypass {
     }
     
     # 解壓縮 ISO
+    if (!(Test-Path $WinPath)) { New-Item -ItemType Directory -Path $WinPath -Force | Out-Null }
     & $7zrPath x $IsoFile -o"$WinPath" -y
     & $7zrPath x $warpperPath -o"$WinPath" -y
     
     # 開啟安裝程式
-    Start-Process -FilePath "setup.exe" -WorkingDirectory $WinPATH
+    Start-Process -FilePath "setup.exe" -WorkingDirectory $WinPath
 } # Install-Windows11Bypass -IsoFile:"C:\Users\User\Desktop\Win11_24H2_Chinese_Traditional_x64.iso"
 
 
