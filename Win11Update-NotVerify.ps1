@@ -34,8 +34,11 @@ function Initialize-7zEnvironment {
 
 # 跳過 Windows11 更新的硬體限制
 function Install-Windows11Bypass {
+    [Alias('BypassWin11')]
     [CmdletBinding()]
     param (
+        [Parameter(Position=0, Mandatory)]
+        [ValidateScript({Test-Path $_})]
         [string] $IsoFile
     )
     # 初始化 7zr
