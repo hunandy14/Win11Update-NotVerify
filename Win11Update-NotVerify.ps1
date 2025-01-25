@@ -39,7 +39,7 @@ function Install-Windows11Bypass {
         [string] $IsoFile
     )
     # 初始化 7zr
-    $7zrPath = Initialize-7zEnvironment
+    $7zrPath = Initialize-7zEnvironment -ForceDownload -ErrorAction Stop
     $WinPath = "${env:Temp}\Win11_ISO"
     $warpperUrl = "https://github.com/hunandy14/Win11Update-NotVerify/raw/refs/heads/master/bypass11/Win11-24H2-Warpper.zip"
     $warpperPath = "${env:Temp}\$([IO.Path]::GetFileName($warpperUrl))"
@@ -48,7 +48,7 @@ function Install-Windows11Bypass {
     try {
         (New-Object Net.WebClient).DownloadFile($warpperUrl, $warpperPath)
     } catch {
-        Write-Error "Failed to download Win11-Warpper package: $($_.Exception.Message)" -ErrorAction $ErrorActionPreference
+        Write-Error "Failed to download Win11-Warpper package: $($_.Exception.Message)" -ErrorAction Stop
     }
     
     # 解壓縮 ISO
