@@ -1,6 +1,6 @@
 # 初始化 7z 環境
 function Initialize-7zEnvironment {
-    [CmdletBinding()]  # 啟用進階函式功能
+    [CmdletBinding()]
     param (
         [switch] $ForceDownload
     )
@@ -34,25 +34,34 @@ function Initialize-7zEnvironment {
 
 # 跳過 Windows11 更新的硬體限制
 function Update-Win11 {
+    [CmdletBinding()]
     param (
         [string] $IsoFile
     )
     # 初始化 7zr
     $7zrPath = Initialize-7zEnvironment
-    $WinPATH = "${env:Temp}\Win11_ISO"
+    $WinPath = "${env:Temp}\Win11_ISO"
+    $warpperUrl = "https://github.com/hunandy14/Win11Update-NotVerify/raw/refs/heads/master/bypass11/Win11-24H2-Warpper.zip"
+    $warpperPath = "${env:Temp}\$([IO.Path]::GetFileName($warpperUrl))"
+
+    # 下載 ISO-Warpper
+    try {
+        (New-Object Net.WebClient).DownloadFile($warpperUrl, $warpperPath)
+    } catch {
+        Write-Error "Failed to download Win11-Warpper package: $($_.Exception.Message)" -ErrorAction $ErrorActionPreference
+    }
     
-    # 使用 7zr 解壓 ISO
-    & $7zrPath x $IsoFile -o $WinPATH
+    # 解壓縮 ISO
+    & $7zrPath x $IsoFile -o"$WinPath" -y
+    & $7zrPath x $warpperPath -o"$WinPath" -y
     
-    Move-Item "$WinPATH\sources\appraiserres.dll" "$WinPATH\sources\_appraiserres.dll" -Force
-    explorer "$WinPATH"
-    explorer "$WinPATH\setup.exe"
-    
-    Write-Host "安裝時務必在第一個畫面選擇" -ForegroundColor:Yellow
-    Write-Host "  變更安裝下載的方式 -> 現在不用" -ForegroundColor:Yellow
-} # Update-Win11 -IsoFile:"D:\DATA\ISO_Files\Win11_Chinese(Traditional)_x64v1.iso"
+    # 開啟安裝程式
+    Start-Process -FilePath "setup.exe" -WorkingDirectory $WinPATH
+} # Update-Win11 -IsoFile:"C:\Users\User\Desktop\Win11_24H2_Chinese_Traditional_x64.iso"
 
 
+
+# 安裝 Windows PC Health Check Setup
 function Install-WindowsPCHealthCheckSetup {
     param (
         [switch] $Force
