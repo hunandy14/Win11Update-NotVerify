@@ -56,6 +56,8 @@ function Install-Windows11Bypass {
     
     # 解壓縮 ISO
     if (!(Test-Path $WinPath)) { New-Item -ItemType Directory -Path $WinPath -Force | Out-Null }
+    Write-Host "正在解壓縮 Windows 11 ISO '$IsoFile' 檔案..." -ForegroundColor DarkCyan
+    Write-Host "  解壓縮位置: $WinPath" -ForegroundColor DarkCyan
     & $7zrPath x $IsoFile -o"$WinPath" -y
     & $7zrPath x $warpperPath -o"$WinPath" -y
     
