@@ -9,23 +9,16 @@ function Initialize-7zEnvironment {
     # $7zPath = Join-Path $env:ProgramFiles "7-Zip\7z.exe"
     # if (Test-Path $7zPath) { return $7zPath }
     
-    # 未安裝則下載精簡版使用
-    $7zrPath = Join-Path $env:TEMP "7zr.exe"
-    $7zrUrls = @(
-        "https://7-zip.org/a/7zr.exe",
-        "https://github.com/hunandy14/Win11Update-NotVerify/raw/refs/heads/master/soft/7zr.exe"
-    )
-    if ((!(Test-Path $7zrPath)) -or $ForceDownload) {
+    # 下載免安裝板使用
+    $7zPath = Join-Path $env:TEMP "7-Zip\7z.exe"
+    $7zUrl = "https://github.com/hunandy14/Win11Update-NotVerify/raw/refs/heads/master/soft/7-Zip2409.zip"
+    if ((!(Test-Path $7zPath)) -or $ForceDownload) {
         try {
-            (New-Object Net.WebClient).DownloadFile($7zrUrls[0], $7zrPath)
-            return $7zrPath
+            (New-Object Net.WebClient).DownloadFile($7zUrl, "$env:TEMP\7-Zip2409.zip")
+            Expand-Archive -Path "$env:TEMP\7-Zip2409.zip" -DestinationPath "$env:TEMP" -Force
+            return $7zPath
         } catch {
-            try {
-                (New-Object Net.WebClient).DownloadFile($7zrUrls[1], $7zrPath)
-                return $7zrPath
-            } catch {
-                Write-Error "Failed to download 7-Zip from both primary and backup sources" -ErrorAction $ErrorActionPreference
-            }
+            Write-Error "Failed to download and extract 7-Zip package" -ErrorAction $ErrorActionPreference
         }
     }
 } # Initialize-7zEnvironment -ForceDownload -ErrorAction Stop; Write-Host "7zr.exe 下載完成"
