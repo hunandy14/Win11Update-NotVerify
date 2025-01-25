@@ -6,8 +6,10 @@ function Initialize-7zEnvironment {
     )
 
     # 如果已安裝直接使用
-    # $7zPath = Join-Path $env:ProgramFiles "7-Zip\7z.exe"
-    # if (Test-Path $7zPath) { return $7zPath }
+    if (!$ForceDownload) {
+        $7zPath = Join-Path $env:ProgramFiles "7-Zip\7z.exe"
+        if (Test-Path $7zPath) { return $7zPath }
+    }
     
     # 下載免安裝板使用
     $7zPath = Join-Path $env:TEMP "7-Zip\7z.exe"
@@ -32,10 +34,11 @@ function Install-Windows11Bypass {
     param (
         [Parameter(Position=0, Mandatory)]
         [ValidateScript({Test-Path $_})]
-        [string] $IsoFile
+        [string] $IsoFile,
+        [switch] $ForceDownload7z
     )
     # 初始化 7zr
-    $7zrPath = Initialize-7zEnvironment -ForceDownload -ErrorAction Stop
+    $7zrPath = Initialize-7zEnvironment -ForceDownload:$ForceDownload7z -ErrorAction Stop
     $WinPath = "${env:Temp}\Win11_ISO"
     $warpperUrl = "https://github.com/hunandy14/Win11Update-NotVerify/raw/refs/heads/master/bypass11/Win11-24H2-Warpper.zip"
     $warpperPath = "${env:Temp}\$([IO.Path]::GetFileName($warpperUrl))"
@@ -62,7 +65,7 @@ function Install-Windows11Bypass {
         Write-Error "Setup file '$setupPath' not found" -ErrorAction Stop
     }
     
-} # BypassWin11 -IsoFile "D:\DATA\ISO_Files\01.Windows\Win11_24H2_Chinese_Traditional_x64.iso"
+} # BypassWin11 -IsoFile "D:\DATA\ISO_Files\01.Windows\Win11_24H2_Chinese_Traditional_x64.iso" -ForceDownload7z
 
 
 
