@@ -1,16 +1,25 @@
+# 初始化 7z 環境
 function Initialize-7zEnvironment {
     param (
-        [switch] $ForceInstall
+        [switch] $ForceDownload
     )
-    $7zPATH = "${env:ProgramFiles}\7-Zip"
-    
-    if ((!(Test-Path $7zPATH)) -or $ForceInstall) {
-        Set-ExecutionPolicy Bypass -S:Process -F
-        Invoke-RestMethod chocolatey.org/install.ps1|Invoke-Expression
-        choco install -y 7zip
+
+    # 如果已安裝直接使用
+    $7zPath = Join-Path $env:ProgramFiles "7-Zip\7z.exe"
+    if ((Test-Path $7zPath) -and (!$ForceDownload)) {
+        return $7zrPath
     }
     
-    $env:Path = "${env:Path};$7zPATH"
+    # 未安裝則下載精簡板使用
+    $7zrUrl = "https://7-zip.org/a/7zr.exe"
+    $7zrPath = Join-Path $env:TEMP "7zr.exe"
+    if ((!(Test-Path $7zrPath)) -or $ForceDownload) {
+        try {
+            (New-Object Net.WebClient).DownloadFile($7zrUrl, $7zrPath)
+            $7zrPath = $7zrPath
+        } catch { throw }
+    }
+    return $7zrPath
 } # Initialize-7zEnvironment
 
 # 跳過 Windows11 更新的硬體限制
@@ -18,10 +27,12 @@ function Update-Win11 {
     param (
         [string] $IsoFile
     )
-    Initialize-7zEnvironment -ForceInstall
+    # 初始化 7zr
+    $7zrPath = Initialize-7zEnvironment
     $WinPATH = "${env:Temp}\Win11_ISO"
-    $cmd = "7z x `"$IsoFile`" -o$WinPATH"
-    Invoke-Expression $cmd
+    
+    # 使用 7zr 解壓 ISO
+    & $7zrPath x $IsoFile -o $WinPATH
     
     Move-Item "$WinPATH\sources\appraiserres.dll" "$WinPATH\sources\_appraiserres.dll" -Force
     explorer "$WinPATH"
