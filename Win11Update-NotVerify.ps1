@@ -49,14 +49,20 @@ function Install-Windows11Bypass {
     
     # 解壓縮 ISO
     if (!(Test-Path $WinPath)) { New-Item -ItemType Directory -Path $WinPath -Force | Out-Null }
-    Write-Host "正在解壓縮 Windows 11 ISO '$IsoFile' 檔案..." -ForegroundColor DarkCyan
-    Write-Host "  解壓縮位置: $WinPath" -ForegroundColor DarkCyan
+    Write-Host "Extracting Windows 11 ISO file '$IsoFile'..." -ForegroundColor DarkCyan
+    Write-Host "  Extraction location: $WinPath" -ForegroundColor DarkCyan
     & $7zrPath x $IsoFile -o"$WinPath" -y
     & $7zrPath x $warpperPath -o"$WinPath" -y
     
     # 開啟安裝程式
-    Start-Process -FilePath "setup.exe" -WorkingDirectory $WinPath
-} # Install-Windows11Bypass -IsoFile:"C:\Users\User\Desktop\Win11_24H2_Chinese_Traditional_x64.iso"
+    $setupPath = Join-Path $WinPath "setup.exe"
+    if (Test-Path $setupPath) {
+        Start-Process -FilePath $setupPath -WorkingDirectory $WinPath
+    } else {
+        Write-Error "Setup file '$setupPath' not found" -ErrorAction Stop
+    }
+    
+} # BypassWin11 -IsoFile "D:\DATA\ISO_Files\01.Windows\Win11_24H2_Chinese_Traditional_x64.iso"
 
 
 
