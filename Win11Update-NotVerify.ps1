@@ -6,8 +6,8 @@ function Initialize-7zEnvironment {
     )
 
     # 如果已安裝直接使用
-    $7zPath = Join-Path $env:ProgramFiles "7-Zip\7z.exe"
-    if (Test-Path $7zPath) { return $7zPath }
+    # $7zPath = Join-Path $env:ProgramFiles "7-Zip\7z.exe"
+    # if (Test-Path $7zPath) { return $7zPath }
     
     # 未安裝則下載精簡版使用
     $7zrPath = Join-Path $env:TEMP "7zr.exe"
