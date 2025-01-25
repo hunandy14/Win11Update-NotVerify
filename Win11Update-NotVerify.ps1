@@ -1,26 +1,36 @@
 # 初始化 7z 環境
 function Initialize-7zEnvironment {
+    [CmdletBinding()]  # 啟用進階函式功能
     param (
         [switch] $ForceDownload
     )
 
     # 如果已安裝直接使用
     $7zPath = Join-Path $env:ProgramFiles "7-Zip\7z.exe"
-    if ((Test-Path $7zPath) -and (!$ForceDownload)) {
-        return $7zrPath
-    }
+    if (Test-Path $7zPath) { return $7zPath }
     
-    # 未安裝則下載精簡板使用
-    $7zrUrl = "https://7-zip.org/a/7zr.exe"
+    # 未安裝則下載精簡版使用
     $7zrPath = Join-Path $env:TEMP "7zr.exe"
+    $7zrUrls = @(
+        "https://7-zip.org/a/7zr.exe",
+        "https://github.com/hunandy14/Win11Update-NotVerify/raw/refs/heads/master/soft/7zr.exe"
+    )
     if ((!(Test-Path $7zrPath)) -or $ForceDownload) {
         try {
-            (New-Object Net.WebClient).DownloadFile($7zrUrl, $7zrPath)
-            $7zrPath = $7zrPath
-        } catch { throw }
+            (New-Object Net.WebClient).DownloadFile($7zrUrls[0], $7zrPath)
+            return $7zrPath
+        } catch {
+            try {
+                (New-Object Net.WebClient).DownloadFile($7zrUrls[1], $7zrPath)
+                return $7zrPath
+            } catch {
+                Write-Error "Failed to download 7-Zip from both primary and backup sources" -ErrorAction $ErrorActionPreference
+            }
+        }
     }
-    return $7zrPath
-} # Initialize-7zEnvironment
+} # Initialize-7zEnvironment -ForceDownload -ErrorAction Stop; Write-Host "7zr.exe 下載完成"
+
+
 
 # 跳過 Windows11 更新的硬體限制
 function Update-Win11 {
