@@ -33,7 +33,7 @@ function Initialize-7zEnvironment {
 
 
 # 跳過 Windows11 更新的硬體限制
-function Update-Win11 {
+function Install-Windows11Bypass {
     [CmdletBinding()]
     param (
         [string] $IsoFile
@@ -57,7 +57,7 @@ function Update-Win11 {
     
     # 開啟安裝程式
     Start-Process -FilePath "setup.exe" -WorkingDirectory $WinPATH
-} # Update-Win11 -IsoFile:"C:\Users\User\Desktop\Win11_24H2_Chinese_Traditional_x64.iso"
+} # Install-Windows11Bypass -IsoFile:"C:\Users\User\Desktop\Win11_24H2_Chinese_Traditional_x64.iso"
 
 
 
