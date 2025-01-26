@@ -1,3 +1,21 @@
+# 下載 Win11ISO
+function Get-Win11IsoUrl {
+    [CmdletBinding()]
+    param (
+        [string] $Path
+    )
+    # 下載 fido.ps1
+    $fidoPath = "${env:TEMP}\Fido.ps1"
+    (New-Object Net.WebClient).DownloadFile(
+        "https://raw.githubusercontent.com/pbatard/Fido/refs/heads/master/Fido.ps1",
+        $fidoPath
+    )
+    # 下載 Win11ISO
+    & $fidoPath -Win '11' -Rel '24H2' -Ed 'Edu' -Lang 'Chinese (Simplified)' -Arch 'x64' -GetUrl
+} # Get-Win11IsoUrl "${env:TEMP}\Win1124H2.iso"
+
+
+
 # 初始化 7z 環境
 function Initialize-7zEnvironment {
     [CmdletBinding()]
@@ -14,10 +32,11 @@ function Initialize-7zEnvironment {
     # 下載免安裝板使用
     $7zPath = Join-Path $env:TEMP "7-Zip\7z.exe"
     $7zUrl = "https://github.com/hunandy14/Win11Update-NotVerify/raw/refs/heads/master/soft/7-Zip2409.zip"
+    $zipPath = Join-Path $env:TEMP ([IO.Path]::GetFileName([Uri]::new($7zUrl).AbsolutePath))
     if ((!(Test-Path $7zPath)) -or $ForceDownload) {
         try {
-            (New-Object Net.WebClient).DownloadFile($7zUrl, "$env:TEMP\7-Zip2409.zip")
-            Expand-Archive -Path "$env:TEMP\7-Zip2409.zip" -DestinationPath "$env:TEMP" -Force
+            (New-Object Net.WebClient).DownloadFile($7zUrl, $zipPath)
+            Expand-Archive -Path $zipPath -DestinationPath $env:TEMP -Force
             return $7zPath
         } catch {
             Write-Error "Failed to download and extract 7-Zip package" -ErrorAction $ErrorActionPreference
