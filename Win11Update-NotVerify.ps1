@@ -52,16 +52,19 @@ function Install-Windows11Bypass {
     [CmdletBinding()]
     param (
         [Parameter(Position=0, Mandatory)]
-        [ValidateScript({Test-Path $_})]
-        [string] $IsoFile,
+        [IO.FileInfo] $IsoFile,
         [switch] $ForceDownload7z
     )
+    
+    # 檢查 ISO 檔案是否存在
+    if (-not $IsoFile.Exists) { Write-Error "ISO file '$($IsoFile.FullName)' does not exist" -ErrorAction Stop }
+    
     # 初始化 7zr
     $7zrPath = Initialize-7zEnvironment -ForceDownload:$ForceDownload7z -ErrorAction Stop
     $WinPath = "${env:Temp}\Win11_ISO"
     $warpperUrl = "https://github.com/hunandy14/Win11Update-NotVerify/raw/refs/heads/master/bypass11/Win11-24H2-Warpper.zip"
     $warpperPath = "${env:Temp}\$([IO.Path]::GetFileName($warpperUrl))"
-
+    
     # 下載 ISO-Warpper
     try {
         (New-Object Net.WebClient).DownloadFile($warpperUrl, $warpperPath)
